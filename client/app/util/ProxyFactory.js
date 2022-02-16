@@ -7,7 +7,7 @@ class ProxyFactory {
       get(target, prop, receiver) {
         if (ProxyFactory._ehFuncao(target[prop]) && props.includes(prop)) {
           return function() {
-            console.log(`"${props}" disparou a armadilha`);
+            console.log(`"${prop}" disparou a armadilha`);
             target[prop].apply(target, arguments);
             armadilha(target);
           }
@@ -19,14 +19,13 @@ class ProxyFactory {
 
       set(target, prop, value, receiver) {
         const updated = Reflect.set(target, prop, value);
-        if(props.includes(prop))
-          armadilha(target);
+        if(props.includes(prop)) armadilha(target);
         return updated;
       }
     });
 
   }
-  
+
   static _ehFuncao(fn) {
     return typeof(fn) == typeof(Function);
   }
