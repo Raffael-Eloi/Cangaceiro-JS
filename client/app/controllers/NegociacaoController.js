@@ -56,6 +56,7 @@ class NegociacaoController {
   //   this._mensagemView = new MensagemView('#mensagemView');
   //   this._mensagemView.update(this._mensagem);
   
+  this._service = new NegociacaoService();
 }
 
   adiciona(event) {
@@ -102,5 +103,22 @@ class NegociacaoController {
     // this._negociacoesView.update(this._negociacoes);
     this._mensagem.texto = 'Negociações foram apagadas com sucesso';
     // this._mensagemView.update(this._mensagem);
+  }
+
+  importaNegociacoes() {
+    this._service.obterNegociacoesDaSemana(
+      (err, negociacoes) => {
+        if (err) {
+          this._mensagem.texto = 'Não foi possível obter nas negociações da semana';
+          return;
+        }
+
+        negociacoes.forEach(
+          negociacao => this._negociacoes.adiciona(negociacao)
+        );
+
+        this._mensagem.texto = 'Negociações importadas com sucesso';
+      }
+    );
   }
 }
