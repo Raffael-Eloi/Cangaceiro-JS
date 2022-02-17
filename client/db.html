@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aprendendo IndexedDB</title>
+</head>
+<body>
+  <script>
+    let connection = null;
+    
+    const openRequest = indexedDB.open('jscangaceiro', 2);
+    // open(nomeDoBancoQueQuerSeConectar, versão do banco)
+
+    /*
+      Toda vez que realizamos uma requisição de abertura, precisaremos lidar com uma TRÍADE de eventos, são eles:
+        () onpugradeneeded
+        () onsuccess
+        () onerror
+        () onblocked
+    */
+
+    /*
+      Object Store -> Análogo ás tabelas do mundo SQL
+        Criamos novas stroes através de uma conexão com o banco durante o evento onupgradeneeded
+    */
+
+    /*
+      Para saber se uma store existe ou não durante uma atualização usamos o método 
+      -> connection.objectStoreNames.contains() passando o nome do store
+      para criar   -> connection.createObjectStore()
+      para deletar -> connection.deleteObjectStore() 
+    */
+
+    openRequest.onupgradeneeded = e => {
+      // funcão que será chamada somente se o banco que estivermos conectando não existir,
+      // ou quando estivermos atualizando um banco já existente
+      console.log('Cria ou altera um banco já existente');
+      
+      // Obtendo a conexão
+      connection = e.target.result;
+
+      if (connection.objectStoreNames.contains('negociacoes')) {
+        connection.deleteObjectStore('negociacoes');
+      }
+
+      connection.createObjectStore('negociacoes', {autoIncrement: true});
+    };
+
+    openRequest.onsuccess = e => {
+      // funçao que será chamada quando uma conexão for obtida com sucesso
+      console.log('Conexão obtida com sucesso!');
+      connection = e.target.result;
+      // "e.target.result" nos dá acesso a uma instância de IDBDatabase 
+
+    }
+
+    openRequest.onerror = e => {
+      // funçao que será chamada caso algum erro ocorra no processo de abertura da conexão
+      console.log(e.target.error);
+    }
+
+    function adiciona() {
+      // NOVA INSTÂNCIA DE NEGOCIAÇÃO
+      const negociacao = new Negociacao(new Date(), 200, 1);
+      
+      // const transaction = connection.transaction(['negociacoes'], 'readwrite');
+      // connection.transaction 1 parametro = array com o nome da store cuja transação queremos criar
+      // connection.transaction 2 parametro = tipo    (caso queira somente leitura é readonly)
+
+      // const store = transaction.objectStore('negociacoes');
+
+      // ATRAVÉS DA STORE, REQUISITAMOS UMA INCLUSÃO
+      // store.add é apenas uma requisição, portando é necessário verificar se foi bem sucedida ou não
+      // const request = store.add(negociacao);
+      
+      const request = connection.transaction(['negociacoes'], 'readwrite')
+      .objectStore('negociacoes')
+      .add(negociacao);
+       
+      request.onsuccess = e => console.log('Negociação salva com sucesso');
+      request.onerror = e => console.log('Não foi possível salvar a negociação ');
+    }
+
+    function listaTodos() {
+      const negociacoes = [];
+
+      /* openCursor() -> retornará uma referência para um objeto que sabe iterar por cada objeto gravado na store */
+      const cursor = connection.transaction(['negociacoes'], 'readwrite')
+      .objectStore('negociacoes')
+      .openCursor();
+
+      cursor.onsuccess = e => {
+        // objeto ponteiro para uma negociação
+        const atual = e.target.result;
+
+        // se for diferente de null, é porque ainda há dados
+        if (atual) {
+          // atual.value guarda os dados da negociação
+
+          // cria uma nova instância antes de adicionar no array
+          const negociacao = new Negociacao(
+            atual.value._data,
+            atual.value._quantidade,
+            atual.value._valor,
+          )
+          negociacoes.push(atual.value);
+          
+          // vai para a próxima posição chamando onsuccess novamente
+          atual.continue();
+        }
+        else {
+          // quando atual for null, é porque não há mais dados
+          // imprimimos no console a lista de negociações
+          console.log(negociacoes);
+        }
+      }
+
+      cursor.onerror = e => {
+        // error.name, para ficar mais sucinta a informação
+        console.log('Error: ' + e.target.error.name);
+      }
+    }
+
+  </script>
+
+  <script src="app/domain/negociacao/Negociacao.js"></script>
+</body>
+</html>
