@@ -106,19 +106,101 @@ class NegociacaoController {
   }
 
   importaNegociacoes() {
-    this._service.obterNegociacoesDaSemana(
-      (err, negociacoes) => {
-        if (err) {
-          this._mensagem.texto = 'Não foi possível obter nas negociações da semana';
-          return;
+    // this._service.obterNegociacoesDaSemana(
+    //   (err, negociacoes) => {
+    //     if (err) {
+    //       this._mensagem.texto = 'Não foi possível obter nas negociações da semana';
+    //       return;
+    //     }
+
+    //     negociacoes.forEach(
+    //       negociacao => this._negociacoes.adiciona(negociacao)
+    //     );
+
+    //     this._mensagem.texto = 'Negociações importadas com sucesso';
+    //   }
+    // );
+
+    // this._service.obterNegociacoesDaSemana()
+    //   .then(
+    //     negociacoes => {
+    //       negociacoes.forEach(
+    //         negociacao => this._negociacoes.adiciona(negociacao)
+    //       );
+    //       this._mensagem.texto = 'Negociações importadas com sucesso';
+    //     },
+
+    //     err => this._mensagem.texto = err
+    //   );
+
+      // const negociacoes = [];
+
+      // this._service
+      // .obterNegociacoesDaSemana()
+      // .then(semana => {
+      //   negociacoes.push(...semana);
+      //   return this._service.obterNegociacoesDaSemanaAnterior();
+      // })
+      // .then(anterior => {
+      //   negociacoes.push(...anterior);
+      //   negociacoes.forEach(
+      //     negociacao => this._negociacoes.adiciona(negociacao)
+      //   )
+      // .then(retrasada => {
+      //   negociacoes.push(...retrasada);
+      //   negociacoes.forEach(
+      //     negociacao => this._negociacoes.adiciona(negociacao)
+      //   );
+        
+      //   this._mensagem.texto = 'Negociações importadas com sucesso';
+      // })
+      // .catch(
+      //   err => this._mensagem.texto = err
+      // );
+      // })
+
+      // RECEBE UM ARRAY DE PROMISES
+      // Promise.all(
+      //   [
+      //     this._service.obterNegociacoesDaSemana(),
+      //     this._service.obterNegociacoesDaSemanaAnterior(),
+      //     this._service.obterNegociacoesDaSemanaRetrasada()
+      //   ]
+      // )
+      // .then( periodo => {
+      //   periodo = periodo.reduce(
+      //     (novoArray, item) => novoArray.concat(item, [])
+      //     .forEach(
+      //       negociacao => this._negociacoes.adiciona(negociacao)
+      //     )
+      //   )
+      //   this._mensagem.texto = 'Negociações importadas com sucesso';
+      // })
+      // .catch(
+      //   err => this._mensagem.texto = err
+      // );
+
+      this._service
+      .obtemNegociacoesDoPeriodo()
+      .then(
+        negociacoes => {
+          negociacoes.filter(
+            novaNegociacao => !this._negociacoes.paraArray().some(
+              negociacaoExistente => novaNegociacao.equals(negociacaoExistente)
+            )
+          ).forEach(
+            negociacao => this._negociacoes.adiciona(negociacao)
+          )
+          this._mensagem.texto = 'Negociações do período importadas com sucesso';
         }
+      )
+      .catch(
+        err => this._mensagem.texto = err
+      );
 
-        negociacoes.forEach(
-          negociacao => this._negociacoes.adiciona(negociacao)
-        );
-
-        this._mensagem.texto = 'Negociações importadas com sucesso';
-      }
-    );
+      // SOME / some() -> itera em cada elemento de uma lista. 
+      // cont_ Assim que encontrar algum (some) elemento de acordo com alguma lógica que retorne true, 
+      // cont_ parará imediatamente de iterar o array retornando true.
+      // cont_ Se nenhum elemento atender o critério de comparação, o array terá sido percorrido até o fim e o retorno de some será false.
   }
 }
