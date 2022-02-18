@@ -56,18 +56,48 @@ class NegociacaoController {
   //   this._mensagemView = new MensagemView('#mensagemView');
   //   this._mensagemView.update(this._mensagem);
   
-  this._service = new NegociacaoService();
-}
+    this._service = new NegociacaoService();
+
+    this._init();
+  }
+  
+  _init() {
+    getNegociacaoDao()
+    .then(
+      dao => dao.listaTodos()
+    )
+    .then(
+      negociacoes => negociacoes.forEach(
+        negociacao => this._negociacoes.adiciona(negociacao)
+      )
+    )
+    .catch(
+      err => this._mensagem.texto = err
+    );
+  }
 
   adiciona(event) {
     try {
       event.preventDefault();
       this._negociacoes.adiciona(this._criaNegociacao());
-      this._mensagem.texto = "Negociação adicionada com sucesso"; 
+
+      getNegociacaoDao()
+      .then(
+        dao => dao.adiciona(negociacao)
+      )
+      .then(() => {
+        // só tentará incluir na tabela se conseguiu antes incluir no banco
+        this._negociacoes.adiciona(negociacao);
+        this._mensagem.texto = "Negociação adicionada com sucesso"; 
+        this._limpaFormulario();
+      })
+      .catch(
+        err => this._mensagem.texto = err
+      );
+
       // this._negociacoesView.update(this._negociacoes);
       // this._mensagemView.update(this._mensagem);
 
-      this._limpaFormulario();
     }
     catch(err) {
       console.log(err);
@@ -99,6 +129,21 @@ class NegociacaoController {
   }
 
   apaga() {
+      getNegociacaoDao()
+      .then(
+        dao => dao.apagaTodos(negociacao)
+      )
+      .then(() => {
+        this._negociacoes.esvazia();
+        this._mensagem.texto = "Negociações apagadas com sucesso"; 
+        this._limpaFormulario();
+      })
+      .catch(
+        err => this._mensagem.texto = err
+      );
+
+
+
     this._negociacoes.esvazia();
     // this._negociacoesView.update(this._negociacoes);
     this._mensagem.texto = 'Negociações foram apagadas com sucesso';

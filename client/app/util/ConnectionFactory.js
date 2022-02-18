@@ -81,3 +81,4 @@ const ConnectionFactory = (() =>  {
 // a variável vive no escopo global
 // porque foi declarada fora da função
 // const ConnectionFactory = tmp();
+
