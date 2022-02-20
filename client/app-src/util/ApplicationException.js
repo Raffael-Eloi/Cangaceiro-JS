@@ -1,9 +1,8 @@
 export class ApplicationException extends Error {
   constructor(msg = "") {
-    super(msg); // Ajusta o name do error
+    super(msg);
 
+    // Ajusta o name do error
     this.name = this.constructor.name;
   }
-
 }
-//# sourceMappingURL=ApplicationException.js.map

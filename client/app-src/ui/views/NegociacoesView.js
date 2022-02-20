@@ -1,6 +1,7 @@
 import { View } from './Views.js';
 import { DateConverter } from '../converters/DateConverters.js.js';
-export class NegociacoesView extends View {
+export class NegociacoesView extends View{
+
   template(model) {
     return `
     <table class="table table-hover table-bordered">
@@ -14,14 +15,20 @@ export class NegociacoesView extends View {
       </thead>
 
       <tbody>
-        ${model.paraArray().map(negociacao => `
+        ${model
+          .paraArray()
+          .map(
+            negociacao =>
+              `
             <tr>
               <td>${DateConverter.paraTexto(negociacao.data)}</td>
               <td>${negociacao.quantidade}</td>
               <td>${negociacao.valor}</td>
               <td>${negociacao.volume}</td>
             </tr>
-          `).join('')}
+          `
+          )
+          .join('')}
       </tbody>
 
       <tfoot>
@@ -32,6 +39,4 @@ export class NegociacoesView extends View {
       </tfoot>
     </table>`;
   }
-
 }
-//# sourceMappingURL=NegociacoesView.js.map

@@ -10,6 +10,4 @@ export class Mensagem {
   set texto(novoTexto) {
     this._texto = novoTexto;
   }
-
 }
-//# sourceMappingURL=Mensagem.js.map

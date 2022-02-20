@@ -10,6 +10,4 @@ export class View {
   template(model) {
     throw new Error('Você precisa implementar o método template');
   }
-
 }
-//# sourceMappingURL=Views.js.map
